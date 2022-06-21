@@ -5,6 +5,14 @@ cuda practice project
 device: RTX 2060  
 nvcc: cuda 10.2
 
+# Bash
+```bash
+nvcc -std=c++11 --gpu-architecture=compute_75 --gpu-code=sm_75 -O2 -lcublas -lcurand sgemm.cu -o sgemm
+./sgemm
+./sgemm 1024
+./sgemm 1024 512 1024
+```
+
 # Optimizing Goal
 - [x] coalesce gmem access (strided access)
 - [x] smem bank conflict
