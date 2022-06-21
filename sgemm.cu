@@ -9,12 +9,6 @@
 #include <curand.h>
 #include <cublas_v2.h>
 
-// 1. coalesce access 2. bank conflict 3. independent overlap (achieved occupancy)
-// 4. hardware constraint(register, shared mem) (theo occupancy)
-
-// TODO optimizing for small grid, split K to gridDim.z
-// due to the register, can not do more overlap
-
 template<int Ms, int Ns, int Ks, int blockDimX, int blockDimY>
 __global__ __launch_bounds__(blockDimX * blockDimY)
 void sgemm(int M, int N, int K, const float alpha, const float beta,
