@@ -34,8 +34,8 @@ void sgemm(int M, int N, int K, const float alpha, const float beta,
     constexpr int Mr = Ms / blockDimX,
                   Nr = Ns / blockDimY;
     float accumulator[Nr][Mr] {};
-    float fragA[Ms / blockDimX] {};
-    float fragB[Ns / blockDimY] {};
+    float fragA[Mr] {};
+    float fragB[Nr] {};
     float4 nextA[Mr/4] {};
     float4 nextB[Nr/4] {};
     
@@ -70,7 +70,7 @@ void sgemm(int M, int N, int K, const float alpha, const float beta,
         for (int kid = 0; kid < Ks; kid ++) {
             // (prefetching next tile) part1
             // load global -> register when a data block start
-            if ((kid & (blockDimY - 1)) == 0 && kblock != (K + Ks - 1) / Ks) {
+            if ((kid & (blockDimY - 1)) == 0 && kblock != (K - 1) / Ks) {
                 # pragma unroll
                 for (int x = 0; x < Ms/4; x += blockDimX) {
                     int y = kid / blockDimY * blockDimY;
@@ -80,7 +80,7 @@ void sgemm(int M, int N, int K, const float alpha, const float beta,
                     nextA[x / blockDimX].w = A[(y + threadIdx.y + Ks) * lda + 4*x + 3*blockDimX + threadIdx.x];
                 }
             }
-            if ((kid & (blockDimX - 1)) == 0 && kblock != (K + Ks - 1) / Ks) {
+            if ((kid & (blockDimX - 1)) == 0 && kblock != (K - 1) / Ks) {
                 # pragma unroll
                 for (int y = 0; y < Ns/4; y += blockDimY) {
                     int x = kid / blockDimX * blockDimX;
@@ -115,14 +115,14 @@ void sgemm(int M, int N, int K, const float alpha, const float beta,
 
             // (prefetching next tile) part2
             // store register -> shared when a data block end (to hide the LDG latency )
-            if ((kid & (blockDimX - 1)) == blockDimX - 1 && kblock != (K + Ks - 1) / Ks) {
+            if ((kid & (blockDimX - 1)) == blockDimX - 1 && kblock != (K - 1) / Ks) {
                 // here useing double tileB to cancel a sync
                 # pragma unroll
                 for (int y = 0; y < Ns/4; y += blockDimY) {
                     tileB[(kblock+1)&1][y + threadIdx.y][kid / blockDimX * blockDimX + threadIdx.x] = nextB[y / blockDimY];
                 }
             }
-            if ((kid & (blockDimY - 1)) == blockDimY - 1 && kblock != (K + Ks - 1) / Ks) {
+            if ((kid & (blockDimY - 1)) == blockDimY - 1 && kblock != (K - 1) / Ks) {
                 __syncthreads();
                 # pragma unroll
                 for (int x = 0; x < Ms/4; x += blockDimX) {
