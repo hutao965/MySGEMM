@@ -20,7 +20,7 @@ nvcc -std=c++11 --gpu-architecture=compute_75 --gpu-code=sm_75 -O2 -lcublas -lcu
 - [ ] prefetch (next frag load -> this frag calculate) to hide the LDS latency (failed due to the register limit)
 - [x] double buffer smem to reduce sync
 - [x] adjust parameters, consider hardware constraints and theoretical occupancy
-- [ ] optimize for small grid (low wave coverage)
+- [ ] use tensor core
 
 
 # Performance (compare with cublas)
