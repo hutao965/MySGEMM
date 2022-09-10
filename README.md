@@ -9,8 +9,6 @@ nvcc: cuda 10.2
 ```bash
 nvcc -std=c++11 --gpu-architecture=compute_75 --gpu-code=sm_75 -O2 -lcublas -lcurand sgemm.cu -o sgemm
 ./sgemm
-./sgemm 1024
-./sgemm 1024 512 1024
 ```
 
 # Optimizing Goal
@@ -28,4 +26,4 @@ nvcc -std=c++11 --gpu-architecture=compute_75 --gpu-code=sm_75 -O2 -lcublas -lcu
 # Performance (compare with cublas)
 |M=N=K|512|1024|2048|4096|8192|16384|
 |:-----|:-----|:-----|:-----|:-----|:-----|:-----|
-|performance|68.36%|83.66%|90.08%|90.72%|91.13%|90.89%|
+|performance|91.87%|91.55%|91.73%|91.90%|91.82%|91.86%|
